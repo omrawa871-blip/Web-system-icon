@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Manajemen CCTV</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .active-tab {
+            box-shadow: inset 0 -4px 0px 0px rgba(0, 0, 0, 0.3);
+            filter: brightness(0.9);
+            opacity: 1 !important;
+        }
+        /* Mencegah pemotongan elemen di tengah halaman PDF */
+        .pdf-page-break, tr, .mobile-row {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
+        }
+        /* Style cetak khusus untuk memastikan form terlihat seperti lembaran kertas dokumen resmi */
+        .printable-area {
+            background: #ffffff !important;
+            color: #000000 !important;
+        }
+        /* Class pembantu untuk menyembunyikan elemen saat proses PDF */
+        .force-hide {
+            display: none !important;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 max-w-4xl mx-auto">
+
+    <header id="main-header" class="bg-white p-4 rounded-xl shadow-sm mb-4 border border-gray-100 text-center md:text-left">
+        <h1 class="text-xl font-bold text-gray-800">Sistem Laporan & Administrasi CCTV</h1>
+        <p class="text-xs text-gray-500 mt-1">Kelola Pekerjaan, Invoice, Penawaran, dan Delivery Order dalam satu aplikasi</p>
+    </header>
+
+    <nav id="main-nav" class="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
+        <button id="btn-laporan" class="tab-btn bg-blue-600 text-white flex-1 min-w-[140px] md:flex-none px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium active-tab transition-all cursor-pointer">
+            Laporan Pekerjaan
+        </button>
+        <button id="btn-invoice" class="tab-btn bg-orange-500 text-white flex-1 min-w-[140px] md:flex-none px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium opacity-70 hover:opacity-100 transition-all cursor-pointer">
+            Invoice Tagihan
+        </button>
+        <button id="btn-penawaran" class="tab-btn bg-purple-600 text-white flex-1 min-w-[140px] md:flex-none px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium opacity-70 hover:opacity-100 transition-all cursor-pointer">
+            Surat Penawaran
+        </button>
+        <button id="btn-do" class="tab-btn bg-emerald-600 text-white flex-1 min-w-[140px] md:flex-none px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium opacity-70 hover:opacity-100 transition-all cursor-pointer">
+            Delivery Order
+        </button>
+    </nav>
+
+    <section id="section-laporan" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 printable-area">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <h2 class="text-sm md:text-md font-bold text-blue-900">Laporan Pekerjaan CCTV</h2>
+            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
+                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print</button>
+                <button onclick="downloadPDF('section-laporan', 'Laporan_Pekerjaan_CCTV')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client</label>
+                <input type="text" placeholder="PT Contoh / Nama Pelanggan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal</label>
+                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
+            </div>
+        </div>
+
+        <h3 class="text-[11px] font-bold text-gray-700 mb-2">Dokumentasi & Hasil Pekerjaan</h3>
+        <div id="laporan-rows" class="space-y-3 mb-4">
+            <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden">Keterangan Pekerjaan</label>
+                    <textarea placeholder="Contoh: Instalasi Kamera 1 sisi koridor barat utama..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden pdf-no-print">Foto Dokumentasi</label>
+                    <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
+                    <img class="img-preview hidden max-w-full h-auto max-h-36 rounded border border-gray-200 mt-2 mx-auto">
+                </div>
+            </div>
+        </div>
+        <button id="btn-tambah-laporan" class="w-full sm:w-auto bg-blue-600 text-white text-xs px-4 py-2.5 rounded-md font-semibold hover:bg-blue-700 transition-all pdf-no-print cursor-pointer">+ Tambah Dokumentasi</button>
+    </section>
+
+    <section id="section-invoice" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <h2 class="text-sm md:text-md font-bold text-orange-700">Invoice Tagihan Pembayaran</h2>
+            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
+                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print Invoice</button>
+                <button onclick="downloadPDF('section-invoice', 'Invoice_Tagihan')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client / Perusahaan</label>
+                <input type="text" placeholder="PT Sukses Mandiri" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Invoice</label>
+                <input type="text" placeholder="INV/2026/0021" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal Jatuh Tempo</label>
+                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Pembuat Invoice</label>
+                <input type="text" placeholder="Nama Admin Keuangan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+            </div>
+        </div>
+
+        <h3 class="text-[11px] font-bold text-gray-700 mb-2">Rincian Biaya & Jasa Pekerjaan</h3>
+        <div id="invoice-rows" class="space-y-3 mb-4">
+            <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                <div class="sm:col-span-2">
+                    <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                </div>
+                <div>
+                    <input type="number" placeholder="Harga (Rp)" class="invoice-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-gray-200 pt-3">
+            <button id="btn-tambah-invoice" class="w-full sm:w-auto bg-orange-500 text-white text-xs px-4 py-2.5 rounded-md font-semibold hover:bg-orange-600 transition-all pdf-no-print cursor-pointer">+ Tambah Item Biaya</button>
+            <div class="text-right w-full sm:w-auto">
+                <span class="text-xs font-bold text-gray-600">Total Tagihan: </span>
+                <span id="invoice-total" class="text-sm font-bold text-orange-600">Rp 0</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-penawaran" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <h2 class="text-sm md:text-md font-bold text-purple-900">Surat Penawaran Harga Jasa/Barang</h2>
+            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
+                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print</button>
+                <button onclick="downloadPDF('section-penawaran', 'Surat_Penawaran')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Kepada Yth. (Calon Client)</label>
+                <input type="text" placeholder="Nama Instansi / Perorangan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Perihal Penawaran</label>
+                <input type="text" placeholder="Contoh: Pengadaan Sistem Keamanan CCTV" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Surat Penawaran</label>
+                <input type="text" placeholder="SPH/2026/012" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Sales / Estimator</label>
+                <input type="text" placeholder="Nama Lengkap Pembuat" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+            </div>
+        </div>
+
+        <h3 class="text-[11px] font-bold text-gray-700 mb-2">Daftar Paket Penawaran</h3>
+        <div id="penawaran-rows" class="space-y-3 mb-4">
+            <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
+                <div class="sm:col-span-2">
+                    <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                </div>
+                <div>
+                    <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-gray-200 pt-3">
+            <button id="btn-tambah-penawaran" class="w-full sm:w-auto bg-purple-600 text-white text-xs px-4 py-2.5 rounded-md font-semibold hover:bg-purple-700 transition-all pdf-no-print cursor-pointer">+ Tambah Item Penawaran</button>
+            <div class="text-right w-full sm:w-auto">
+                <span class="text-xs font-bold text-gray-600">Total Estimasi: </span>
+                <span id="penawaran-total" class="text-sm font-bold text-purple-700">Rp 0</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="section-do" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+            <h2 class="text-sm md:text-md font-bold text-emerald-950">Delivery Order (Surat Jalan Barang)</h2>
+            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
+                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print DO</button>
+                <button onclick="downloadPDF('section-do', 'Delivery_Order')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Pembuat DO</label>
+                <input type="text" placeholder="Nama Admin / Logistik" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client</label>
+                <input type="text" placeholder="Nama Perusahaan / Penerima" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal Pengiriman</label>
+                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Delivery Order</label>
+                <input type="text" placeholder="DO/2026/0001" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+            </div>
+        </div>
+
+        <h3 class="text-[11px] font-bold text-gray-700 mb-2">Daftar Material & Foto Fisik Barang</h3>
+        <div id="do-material-rows" class="space-y-3 mb-4">
+            <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden">Spesifikasi Material</label>
+                    <textarea placeholder="Contoh: 4 Unit Kamera Dome Hikvision, 1 Roll Coaxial..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
+                </div>
+                <div>
+                    <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden pdf-no-print">Foto Kondisi Barang</label>
+                    <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
+                    <img class="img-preview hidden max-w-full h-auto max-h-36 rounded border border-gray-200 mt-2 mx-auto">
+                </div>
+            </div>
+        </div>
+        <button id="btn-tambah-material" class="w-full sm:w-auto bg-emerald-600 text-white text-xs px-4 py-2.5 rounded-md font-semibold hover:bg-emerald-700 transition-all pdf-no-print cursor-pointer">+ Tambah Baris Material</button>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Kontrol Tab Perpindahan Menu
+            const tabs = {
+                laporan: document.getElementById("btn-laporan"),
+                invoice: document.getElementById("btn-invoice"),
+                penawaran: document.getElementById("btn-penawaran"),
+                do: document.getElementById("btn-do")
+            };
+
+            const sections = {
+                laporan: document.getElementById("section-laporan"),
+                invoice: document.getElementById("section-invoice"),
+                penawaran: document.getElementById("section-penawaran"),
+                do: document.getElementById("section-do")
+            };
+
+            function switchTab(activeTabKey, targetSection) {
+                Object.values(tabs).forEach(tab => {
+                    tab.classList.add("opacity-70");
+                    tab.classList.remove("active-tab");
+                });
+                tabs[activeTabKey].classList.remove("opacity-70");
+                tabs[activeTabKey].classList.add("active-tab");
+
+                Object.values(sections).forEach(section => section.classList.add("hidden"));
+                targetSection.classList.remove("hidden");
+            }
+
+            tabs.laporan.addEventListener("click", () => switchTab('laporan', sections.laporan));
+            tabs.invoice.addEventListener("click", () => switchTab('invoice', sections.invoice));
+            tabs.penawaran.addEventListener("click", () => switchTab('penawaran', sections.penawaran));
+            tabs.do.addEventListener("click", () => switchTab('do', sections.do));
+
+            // Tambah baris: Laporan Pekerjaan
+            document.getElementById("btn-tambah-laporan").addEventListener("click", function() {
+                const container = document.getElementById("laporan-rows");
+                const div = document.createElement("div");
+                div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3";
+                div.innerHTML = `
+                    <div class="md:col-span-2">
+                        <textarea placeholder="Deskripsi pekerjaan..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
+                        <img class="img-preview hidden max-w-full h-auto max-h-36 rounded border border-gray-200 mt-2 mx-auto">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Tambah baris: Invoice Tagihan
+            document.getElementById("btn-tambah-invoice").addEventListener("click", function() {
+                const container = document.getElementById("invoice-rows");
+                const div = document.createElement("div");
+                div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center";
+                div.innerHTML = `
+                    <div class="sm:col-span-2">
+                        <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                    </div>
+                    <div>
+                        <input type="number" placeholder="Harga (Rp)" class="invoice-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Tambah baris: Surat Penawaran
+            document.getElementById("btn-tambah-penawaran").addEventListener("click", function() {
+                const container = document.getElementById("penawaran-rows");
+                const div = document.createElement("div");
+                div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center";
+                div.innerHTML = `
+                    <div class="sm:col-span-2">
+                        <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                    </div>
+                    <div>
+                        <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            // Tambah baris: Delivery Order
+            document.getElementById("btn-tambah-material").addEventListener("click", function() {
+                const container = document.getElementById("do-material-rows");
+                const div = document.createElement("div");
+                div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3";
+                div.innerHTML = `
+                    <div class="md:col-span-2">
+                        <textarea placeholder="Nama barang, tipe, spesifikasi..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
+                        <img class="img-preview hidden max-w-full h-auto max-h-36 rounded border border-gray-200 mt-2 mx-auto">
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        });
+
+        // Perhitungan total nominal rupiah otomatis
+        function hitungTotalInvoice() {
+            let total = 0;
+            document.querySelectorAll(".invoice-harga").forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById("invoice-total").innerText = "Rp " + total.toLocaleString("id-ID");
+        }
+
+        function hitungTotalPenawaran() {
+            let total = 0;
+            document.querySelectorAll(".penawaran-harga").forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById("penawaran-total").innerText = "Rp " + total.toLocaleString("id-ID");
+        }
+
+        // Preview File Gambar lokal
+        function previewImage(input) {
+            const file = input.files[0];
+            const preview = input.nextElementSibling;
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove("hidden");
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // =======================================================
+        // METODE DOWNLOAD PDF YANG DIOPTIMALKAN (MOBILE & PC)
+        // =======================================================
+        function downloadPDF(sectionId, fileName) {
+            const element = document.getElementById(sectionId);
+            
+            // Pilih semua elemen yang harus disembunyikan
+            const noPrintElements = element.querySelectorAll('.pdf-no-print');
+            const mainNav = document.getElementById('main-nav');
+            const mainHeader = document.getElementById('main-header');
+            
+            // Sembunyikan elemen menggunakan class utilitas terisolasi
+            if(mainNav) mainNav.classList.add('force-hide');
+            if(mainHeader) mainHeader.classList.add('force-hide');
+            noPrintElements.forEach(el => el.classList.add('force-hide'));
+
+            // Deteksi orientasi otomatis berdasarkan lebar elemen saat ini
+            const width = element.offsetWidth;
+            const orientation = width > 750 ? 'landscape' : 'portrait';
+
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     fileName + '.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    letterRendering: true,
+                    scrollY: 0
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: orientation },
+                pagebreak:    { mode: ['avoid-all', 'css'] }
+            };
+
+            // Menggunakan metode .save() standar html2pdf yang paling kompatibel di memori browser HP
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Pulihkan layout web setelah proses render selesai sukses
+                if(mainNav) mainNav.classList.remove('force-hide');
+                if(mainHeader) mainHeader.classList.remove('force-hide');
+                noPrintElements.forEach(el => el.classList.remove('force-hide'));
+            }).catch(err => {
+                console.error("Gagal mendownload PDF:", err);
+                // Pembersihan darurat jika terjadi kesalahan di tengah jalan
+                if(mainNav) mainNav.classList.remove('force-hide');
+                if(mainHeader) mainHeader.classList.remove('force-hide');
+                noPrintElements.forEach(el => el.classList.remove('force-hide'));
+                alert("Gagal memproses PDF. Silakan coba kembali.");
+            });
+        }
+    </script>
+</body>
+</html>
