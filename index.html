@@ -35,6 +35,7 @@
     <header id="main-header" class="bg-white p-4 rounded-xl shadow-sm mb-4 border border-gray-100 text-center md:text-left">
         <h1 class="text-xl font-bold text-gray-800">Sistem Laporan & Administrasi CCTV</h1>
         <p class="text-xs text-gray-500 mt-1">Kelola Pekerjaan, Invoice, Penawaran, dan Delivery Order dalam satu aplikasi</p>
+        <span id="status-save" class="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded font-medium mt-2 inline-block hidden">Data Tersimpan & PDF Siap</span>
     </header>
 
     <nav id="main-nav" class="flex flex-wrap gap-2 justify-center md:justify-start mb-4">
@@ -53,22 +54,18 @@
     </nav>
 
     <section id="section-laporan" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 printable-area">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <div class="flex justify-between items-center mb-4">
             <h2 class="text-sm md:text-md font-bold text-blue-900">Laporan Pekerjaan CCTV</h2>
-            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
-                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print</button>
-                <button onclick="downloadPDF('section-laporan', 'Laporan_Pekerjaan_CCTV')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client</label>
-                <input type="text" placeholder="PT Contoh / Nama Pelanggan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
+                <input type="text" id="lap-client" placeholder="PT Contoh / Nama Pelanggan" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal</label>
-                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
+                <input type="date" id="lap-tanggal" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-blue-500 bg-gray-50/50">
             </div>
         </div>
 
@@ -77,7 +74,7 @@
             <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="md:col-span-2">
                     <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden">Keterangan Pekerjaan</label>
-                    <textarea placeholder="Contoh: Instalasi Kamera 1 sisi koridor barat utama..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
+                    <textarea placeholder="Contoh: Instalasi Kamera 1 sisi koridor barat utama..." class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
                 </div>
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden pdf-no-print">Foto Dokumentasi</label>
@@ -90,30 +87,26 @@
     </section>
 
     <section id="section-invoice" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <div class="mb-4">
             <h2 class="text-sm md:text-md font-bold text-orange-700">Invoice Tagihan Pembayaran</h2>
-            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
-                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print Invoice</button>
-                <button onclick="downloadPDF('section-invoice', 'Invoice_Tagihan')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client / Perusahaan</label>
-                <input type="text" placeholder="PT Sukses Mandiri" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+                <input type="text" id="inv-client" placeholder="PT Sukses Mandiri" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Invoice</label>
-                <input type="text" placeholder="INV/2026/0021" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+                <input type="text" id="inv-no" placeholder="INV/2026/0021" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal Jatuh Tempo</label>
-                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+                <input type="date" id="inv-tempo" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Pembuat Invoice</label>
-                <input type="text" placeholder="Nama Admin Keuangan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
+                <input type="text" id="inv-pembuat" placeholder="Nama Admin Keuangan" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-orange-500 bg-gray-50/50">
             </div>
         </div>
 
@@ -121,10 +114,10 @@
         <div id="invoice-rows" class="space-y-3 mb-4">
             <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
                 <div class="sm:col-span-2">
-                    <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                    <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white">
                 </div>
                 <div>
-                    <input type="number" placeholder="Harga (Rp)" class="invoice-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
+                    <input type="number" placeholder="Harga (Rp)" class="invoice-harga auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
                 </div>
             </div>
         </div>
@@ -139,30 +132,26 @@
     </section>
 
     <section id="section-penawaran" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <div class="mb-4">
             <h2 class="text-sm md:text-md font-bold text-purple-900">Surat Penawaran Harga Jasa/Barang</h2>
-            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
-                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print</button>
-                <button onclick="downloadPDF('section-penawaran', 'Surat_Penawaran')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Kepada Yth. (Calon Client)</label>
-                <input type="text" placeholder="Nama Instansi / Perorangan" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+                <input type="text" id="pen-client" placeholder="Nama Instansi / Perorangan" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Perihal Penawaran</label>
-                <input type="text" placeholder="Contoh: Pengadaan Sistem Keamanan CCTV" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+                <input type="text" id="pen-perihal" placeholder="Contoh: Pengadaan Sistem Keamanan CCTV" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Surat Penawaran</label>
-                <input type="text" placeholder="SPH/2026/012" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+                <input type="text" id="pen-no" placeholder="SPH/2026/012" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Sales / Estimator</label>
-                <input type="text" placeholder="Nama Lengkap Pembuat" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
+                <input type="text" id="pen-sales" placeholder="Nama Lengkap Pembuat" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-purple-500 bg-gray-50/50">
             </div>
         </div>
 
@@ -170,10 +159,10 @@
         <div id="penawaran-rows" class="space-y-3 mb-4">
             <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
                 <div class="sm:col-span-2">
-                    <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                    <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white">
                 </div>
                 <div>
-                    <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
+                    <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
                 </div>
             </div>
         </div>
@@ -188,30 +177,26 @@
     </section>
 
     <section id="section-do" class="main-section bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100 hidden printable-area">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+        <div class="mb-4">
             <h2 class="text-sm md:text-md font-bold text-emerald-950">Delivery Order (Surat Jalan Barang)</h2>
-            <div class="flex gap-1.5 w-full sm:w-auto pdf-no-print">
-                <button onclick="window.print()" class="flex-1 sm:flex-none bg-black text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center">Print DO</button>
-                <button onclick="downloadPDF('section-do', 'Delivery_Order')" class="flex-1 sm:flex-none bg-red-600 text-white text-xs px-3 py-2 rounded font-medium cursor-pointer text-center font-bold shadow-sm">Download PDF</button>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Pembuat DO</label>
-                <input type="text" placeholder="Nama Admin / Logistik" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+                <input type="text" id="do-pembuat" placeholder="Nama Admin / Logistik" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Nama Client</label>
-                <input type="text" placeholder="Nama Perusahaan / Penerima" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+                <input type="text" id="do-client" placeholder="Nama Perusahaan / Penerima" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">Tanggal Pengiriman</label>
-                <input type="date" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+                <input type="date" id="do-tanggal" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
             </div>
             <div>
                 <label class="block text-[11px] font-semibold text-gray-600 mb-1">No. Delivery Order</label>
-                <input type="text" placeholder="DO/2026/0001" class="w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
+                <input type="text" id="do-no" placeholder="DO/2026/0001" class="auto-save w-full text-xs p-2 border border-gray-300 rounded-md focus:outline-emerald-500 bg-gray-50/50">
             </div>
         </div>
 
@@ -220,7 +205,7 @@
             <div class="mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div class="md:col-span-2">
                     <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden">Spesifikasi Material</label>
-                    <textarea placeholder="Contoh: 4 Unit Kamera Dome Hikvision, 1 Roll Coaxial..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
+                    <textarea placeholder="Contoh: 4 Unit Kamera Dome Hikvision, 1 Roll Coaxial..." class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
                 </div>
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-gray-400 mb-1 md:hidden pdf-no-print">Foto Kondisi Barang</label>
@@ -233,6 +218,9 @@
     </section>
 
     <script>
+        let saveTimeout;
+        let currentTab = 'laporan';
+
         document.addEventListener("DOMContentLoaded", function () {
             const tabs = {
                 laporan: document.getElementById("btn-laporan"),
@@ -249,6 +237,7 @@
             };
 
             function switchTab(activeTabKey, targetSection) {
+                currentTab = activeTabKey;
                 Object.values(tabs).forEach(tab => {
                     tab.classList.add("opacity-70");
                     tab.classList.remove("active-tab");
@@ -265,6 +254,13 @@
             tabs.penawaran.addEventListener("click", () => switchTab('penawaran', sections.penawaran));
             tabs.do.addEventListener("click", () => switchTab('do', sections.do));
 
+            // Trigger simpan otomatis saat form statis diubah
+            document.body.addEventListener('input', function(e) {
+                if(e.target.classList.contains('auto-save') || e.target.classList.contains('auto-save-row')) {
+                    triggerAutoSave();
+                }
+            });
+
             // Tambah baris: Laporan Pekerjaan
             document.getElementById("btn-tambah-laporan").addEventListener("click", function() {
                 const container = document.getElementById("laporan-rows");
@@ -272,7 +268,7 @@
                 div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3";
                 div.innerHTML = `
                     <div class="md:col-span-2">
-                        <textarea placeholder="Deskripsi pekerjaan..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
+                        <textarea placeholder="Deskripsi pekerjaan..." class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded focus:outline-blue-500 bg-white" rows="3"></textarea>
                     </div>
                     <div>
                         <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
@@ -280,6 +276,7 @@
                     </div>
                 `;
                 container.appendChild(div);
+                triggerAutoSave();
             });
 
             // Tambah baris: Invoice Tagihan
@@ -289,13 +286,14 @@
                 div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center";
                 div.innerHTML = `
                     <div class="sm:col-span-2">
-                        <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                        <input type="text" placeholder="Nama Barang / Jasa Instalasi" class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white">
                     </div>
                     <div>
-                        <input type="number" placeholder="Harga (Rp)" class="invoice-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
+                        <input type="number" placeholder="Harga (Rp)" class="invoice-harga auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalInvoice()">
                     </div>
                 `;
                 container.appendChild(div);
+                triggerAutoSave();
             });
 
             // Tambah baris: Surat Penawaran
@@ -305,13 +303,14 @@
                 div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 sm:grid-cols-3 gap-2 items-center";
                 div.innerHTML = `
                     <div class="sm:col-span-2">
-                        <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="w-full text-xs p-2 border border-gray-200 rounded bg-white">
+                        <input type="text" placeholder="Spesifikasi Paket / Perangkat" class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white">
                     </div>
                     <div>
-                        <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
+                        <input type="number" placeholder="Estimasi Biaya (Rp)" class="penawaran-harga auto-save-row w-full text-xs p-2 border border-gray-200 rounded bg-white" oninput="hitungTotalPenawaran()">
                     </div>
                 `;
                 container.appendChild(div);
+                triggerAutoSave();
             });
 
             // Tambah baris: Delivery Order
@@ -321,7 +320,7 @@
                 div.className = "mobile-row p-3 border border-gray-200 rounded-lg bg-gray-50/30 grid grid-cols-1 md:grid-cols-3 gap-3";
                 div.innerHTML = `
                     <div class="md:col-span-2">
-                        <textarea placeholder="Nama barang, tipe, spesifikasi..." class="w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
+                        <textarea placeholder="Nama barang, tipe, spesifikasi..." class="auto-save-row w-full text-xs p-2 border border-gray-200 rounded focus:outline-emerald-500 bg-white" rows="3"></textarea>
                     </div>
                     <div>
                         <input type="file" accept="image/*" onchange="previewImage(this)" class="w-full text-xs text-gray-500 pdf-no-print">
@@ -329,7 +328,11 @@
                     </div>
                 `;
                 container.appendChild(div);
+                triggerAutoSave();
             });
+
+            // Load data lama jika ada di localStorage
+            muatDataLokal();
         });
 
         function hitungTotalInvoice() {
@@ -338,6 +341,7 @@
                 total += parseFloat(input.value) || 0;
             });
             document.getElementById("invoice-total").innerText = "Rp " + total.toLocaleString("id-ID");
+            triggerAutoSave();
         }
 
         function hitungTotalPenawaran() {
@@ -346,6 +350,7 @@
                 total += parseFloat(input.value) || 0;
             });
             document.getElementById("penawaran-total").innerText = "Rp " + total.toLocaleString("id-ID");
+            triggerAutoSave();
         }
 
         function previewImage(input) {
@@ -356,28 +361,84 @@
                 reader.onload = function(e) {
                     preview.src = e.target.result;
                     preview.classList.remove("hidden");
+                    triggerAutoSave(); // Simpan & Unduh saat foto masuk
                 }
                 reader.readAsDataURL(file);
             }
         }
 
         // =======================================================
-        // METODE DOWNLOAD PDF YANG DIOPTIMALKAN (FIX BUG UNTUK MOBILE)
+        // SISTEM AUTO-SAVE KE LOCALSTORAGE & AUTO-DOWNLOAD PDF
         // =======================================================
+        function triggerAutoSave() {
+            clearTimeout(saveTimeout);
+            const statusLabel = document.getElementById('status-save');
+            statusLabel.innerText = "Sedang mengetik...";
+            statusLabel.classList.remove('hidden', 'bg-green-100', 'text-green-700');
+            statusLabel.classList.add('bg-amber-100', 'text-amber-700');
+
+            // Jeda 2 detik setelah user berhenti mengetik/mengisi, data langsung dieksekusi
+            saveTimeout = setTimeout(() => {
+                simpanKeLokal();
+                statusLabel.innerText = "Data Tersimpan di HP & Mengunduh PDF...";
+                statusLabel.classList.remove('bg-amber-100', 'text-amber-700');
+                statusLabel.classList.add('bg-green-100', 'text-green-700');
+                
+                // Otomatis download halaman tab yang sedang aktif saat ini
+                let activeSectionId = 'section-' + currentTab;
+                let activeFileName = 'Dokumen_' + currentTab.toUpperCase();
+                downloadPDF(activeSectionId, activeFileName);
+            }, 2000);
+        }
+
+        function simpanKeLokal() {
+            const appData = {
+                lapClient: document.getElementById('lap-client').value,
+                lapTanggal: document.getElementById('lap-tanggal').value,
+                invClient: document.getElementById('inv-client').value,
+                invNo: document.getElementById('inv-no').value,
+                invTempo: document.getElementById('inv-tempo').value,
+                invPembuat: document.getElementById('inv-pembuat').value,
+                penClient: document.getElementById('pen-client').value,
+                penPerihal: document.getElementById('pen-perihal').value,
+                penNo: document.getElementById('pen-no').value,
+                doPembuat: document.getElementById('do-pembuat').value,
+                doClient: document.getElementById('do-client').value,
+                doTanggal: document.getElementById('do-tanggal').value,
+                doNo: document.getElementById('do-no').value
+            };
+            localStorage.setItem('cctv_adm_data', JSON.stringify(appData));
+        }
+
+        function muatDataLokal() {
+            const localData = localStorage.getItem('cctv_adm_data');
+            if (localData) {
+                const data = JSON.parse(localData);
+                if(data.lapClient) document.getElementById('lap-client').value = data.lapClient;
+                if(data.lapTanggal) document.getElementById('lap-tanggal').value = data.lapTanggal;
+                if(data.invClient) document.getElementById('inv-client').value = data.invClient;
+                if(data.invNo) document.getElementById('inv-no').value = data.invNo;
+                if(data.invTempo) document.getElementById('inv-tempo').value = data.invTempo;
+                if(data.invPembuat) document.getElementById('inv-pembuat').value = data.invPembuat;
+                if(data.penClient) document.getElementById('pen-client').value = data.penClient;
+                if(data.penPerihal) document.getElementById('pen-perihal').value = data.penPerihal;
+                if(data.penNo) document.getElementById('pen-no').value = data.penNo;
+                if(data.doPembuat) document.getElementById('do-pembuat').value = data.doPembuat;
+                if(data.doClient) document.getElementById('do-client').value = data.doClient;
+                if(data.doTanggal) document.getElementById('do-tanggal').value = data.doTanggal;
+                if(data.doNo) document.getElementById('do-no').value = data.doNo;
+            }
+        }
+
         function downloadPDF(sectionId, fileName) {
             const element = document.getElementById(sectionId);
             
-            // 1. SOLUSI UTAMA FORMS DI HP: Salin nilai ketikan user ke dalam HTML fisik agar terbaca sistem canvas
+            // Sinkronisasi data form ke DOM fisik agar tidak kosong saat dirender canvas
             const inputs = element.querySelectorAll('input, textarea');
             inputs.forEach(input => {
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    if (input.checked) input.setAttribute('checked', 'checked');
-                    else input.removeAttribute('checked');
-                } else {
-                    input.setAttribute('value', input.value);
-                    if(input.tagName.toLowerCase() === 'textarea') {
-                        input.innerHTML = input.value;
-                    }
+                input.setAttribute('value', input.value);
+                if(input.tagName.toLowerCase() === 'textarea') {
+                    input.innerHTML = input.value;
                 }
             });
 
@@ -392,13 +453,12 @@
             const width = element.offsetWidth;
             const orientation = width > 750 ? 'landscape' : 'portrait';
 
-            // 2. OPTIMASI CONFIG: Kompresi gambar disesuaikan agar HP ram rendah tidak crash
             const opt = {
                 margin:       [10, 10, 10, 10],
                 filename:     fileName + '_' + new Date().toISOString().slice(0,10) + '.pdf',
                 image:        { type: 'jpeg', quality: 0.95 }, 
                 html2canvas:  { 
-                    scale: 1.5, // Diturunkan dari 2 ke 1.5 agar memori HP stabil & proses download cepat
+                    scale: 1.5, 
                     useCORS: true, 
                     logging: false,
                     letterRendering: true,
@@ -408,20 +468,16 @@
                 pagebreak:    { mode: ['avoid-all', 'css'] }
             };
 
-            // 3. Eksekusi program dengan sistem penundaan (setTimeout) singkat untuk sinkronisasi render di HP
-            setTimeout(() => {
-                html2pdf().set(opt).from(element).save().then(() => {
-                    if(mainNav) mainNav.classList.remove('force-hide');
-                    if(mainHeader) mainHeader.classList.remove('force-hide');
-                    noPrintElements.forEach(el => el.classList.remove('force-hide'));
-                }).catch(err => {
-                    console.error("Gagal mendownload PDF:", err);
-                    if(mainNav) mainNav.classList.remove('force-hide');
-                    if(mainHeader) mainHeader.classList.remove('force-hide');
-                    noPrintElements.forEach(el => el.classList.remove('force-hide'));
-                    alert("Gagal memproses PDF secara otomatis. Silakan gunakan tombol 'Print' lalu pilih 'Simpan sebagai PDF'.");
-                });
-            }, 300);
+            html2pdf().set(opt).from(element).save().then(() => {
+                if(mainNav) mainNav.classList.remove('force-hide');
+                if(mainHeader) mainHeader.classList.remove('force-hide');
+                noPrintElements.forEach(el => el.classList.remove('force-hide'));
+            }).catch(err => {
+                console.error("Gagal cetak otomatis:", err);
+                if(mainNav) mainNav.classList.remove('force-hide');
+                if(mainHeader) mainHeader.classList.remove('force-hide');
+                noPrintElements.forEach(el => el.classList.remove('force-hide'));
+            });
         }
     </script>
 </body>
