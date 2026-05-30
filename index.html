@@ -17,17 +17,14 @@
             filter: brightness(0.9);
             opacity: 1 !important;
         }
-        /* Mencegah pemotongan elemen di tengah halaman PDF */
         .pdf-page-break, tr, .mobile-row {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
         }
-        /* Style cetak khusus untuk memastikan form terlihat seperti lembaran kertas dokumen resmi */
         .printable-area {
             background: #ffffff !important;
             color: #000000 !important;
         }
-        /* Class pembantu untuk menyembunyikan elemen saat proses PDF */
         .force-hide {
             display: none !important;
         }
@@ -237,7 +234,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Kontrol Tab Perpindahan Menu
             const tabs = {
                 laporan: document.getElementById("btn-laporan"),
                 invoice: document.getElementById("btn-invoice"),
@@ -336,7 +332,6 @@
             });
         });
 
-        // Perhitungan total nominal rupiah otomatis
         function hitungTotalInvoice() {
             let total = 0;
             document.querySelectorAll(".invoice-harga").forEach(input => {
@@ -353,7 +348,6 @@
             document.getElementById("penawaran-total").innerText = "Rp " + total.toLocaleString("id-ID");
         }
 
-        // Preview File Gambar lokal
         function previewImage(input) {
             const file = input.files[0];
             const preview = input.nextElementSibling;
@@ -368,54 +362,66 @@
         }
 
         // =======================================================
-        // METODE DOWNLOAD PDF YANG DIOPTIMALKAN (MOBILE & PC)
+        // METODE DOWNLOAD PDF YANG DIOPTIMALKAN (FIX BUG UNTUK MOBILE)
         // =======================================================
         function downloadPDF(sectionId, fileName) {
             const element = document.getElementById(sectionId);
             
-            // Pilih semua elemen yang harus disembunyikan
+            // 1. SOLUSI UTAMA FORMS DI HP: Salin nilai ketikan user ke dalam HTML fisik agar terbaca sistem canvas
+            const inputs = element.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    if (input.checked) input.setAttribute('checked', 'checked');
+                    else input.removeAttribute('checked');
+                } else {
+                    input.setAttribute('value', input.value);
+                    if(input.tagName.toLowerCase() === 'textarea') {
+                        input.innerHTML = input.value;
+                    }
+                }
+            });
+
             const noPrintElements = element.querySelectorAll('.pdf-no-print');
             const mainNav = document.getElementById('main-nav');
             const mainHeader = document.getElementById('main-header');
             
-            // Sembunyikan elemen menggunakan class utilitas terisolasi
             if(mainNav) mainNav.classList.add('force-hide');
             if(mainHeader) mainHeader.classList.add('force-hide');
             noPrintElements.forEach(el => el.classList.add('force-hide'));
 
-            // Deteksi orientasi otomatis berdasarkan lebar elemen saat ini
             const width = element.offsetWidth;
             const orientation = width > 750 ? 'landscape' : 'portrait';
 
+            // 2. OPTIMASI CONFIG: Kompresi gambar disesuaikan agar HP ram rendah tidak crash
             const opt = {
                 margin:       [10, 10, 10, 10],
-                filename:     fileName + '.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
+                filename:     fileName + '_' + new Date().toISOString().slice(0,10) + '.pdf',
+                image:        { type: 'jpeg', quality: 0.95 }, 
                 html2canvas:  { 
-                    scale: 2, 
+                    scale: 1.5, // Diturunkan dari 2 ke 1.5 agar memori HP stabil & proses download cepat
                     useCORS: true, 
                     logging: false,
                     letterRendering: true,
-                    scrollY: 0
+                    windowWidth: width
                 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: orientation },
                 pagebreak:    { mode: ['avoid-all', 'css'] }
             };
 
-            // Menggunakan metode .save() standar html2pdf yang paling kompatibel di memori browser HP
-            html2pdf().set(opt).from(element).save().then(() => {
-                // Pulihkan layout web setelah proses render selesai sukses
-                if(mainNav) mainNav.classList.remove('force-hide');
-                if(mainHeader) mainHeader.classList.remove('force-hide');
-                noPrintElements.forEach(el => el.classList.remove('force-hide'));
-            }).catch(err => {
-                console.error("Gagal mendownload PDF:", err);
-                // Pembersihan darurat jika terjadi kesalahan di tengah jalan
-                if(mainNav) mainNav.classList.remove('force-hide');
-                if(mainHeader) mainHeader.classList.remove('force-hide');
-                noPrintElements.forEach(el => el.classList.remove('force-hide'));
-                alert("Gagal memproses PDF. Silakan coba kembali.");
-            });
+            // 3. Eksekusi program dengan sistem penundaan (setTimeout) singkat untuk sinkronisasi render di HP
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    if(mainNav) mainNav.classList.remove('force-hide');
+                    if(mainHeader) mainHeader.classList.remove('force-hide');
+                    noPrintElements.forEach(el => el.classList.remove('force-hide'));
+                }).catch(err => {
+                    console.error("Gagal mendownload PDF:", err);
+                    if(mainNav) mainNav.classList.remove('force-hide');
+                    if(mainHeader) mainHeader.classList.remove('force-hide');
+                    noPrintElements.forEach(el => el.classList.remove('force-hide'));
+                    alert("Gagal memproses PDF secara otomatis. Silakan gunakan tombol 'Print' lalu pilih 'Simpan sebagai PDF'.");
+                });
+            }, 300);
         }
     </script>
 </body>
