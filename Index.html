@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sistem Administrasi Terpadu V3 - Professional Enterprise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --maroon-primary: #990000;
+            --maroon-dark: #7a0000;
+            --sidebar-width: 260px;
+        }
+        body { 
+            background-color: #f4f6f9; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow-x: hidden;
+        }
+        /* SIDEBAR STYLES */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #1e2229;
+            color: #fff;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .sidebar-brand {
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            background-color: #171a21;
+            border-bottom: 1px solid #2c313d;
+            color: #ff9999;
+            letter-spacing: 1px;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        .sidebar-menu li a:hover, .sidebar-menu li.active a {
+            color: #fff;
+            background-color: var(--maroon-primary);
+        }
+        .sidebar-menu li a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+        /* MAIN CONTENT STYLES */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 25px;
+            min-height: 100vh;
+            transition: all 0.3s;
+        }
+        .card { 
+            border: none; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            margin-bottom: 20px;
+        }
+        .form-section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #495057;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 4px;
+            margin-top: 18px;
+            margin-bottom: 10px;
+        }
+        
+        /* INVOICE & REPORT PAPER PRINT STYLE */
+        .invoice-paper, .report-paper { 
+            background: #ffffff; 
+            border: 1px solid #c0c0c0; 
+            padding: 45px 40px; 
+            color: #000000; 
+            font-family: Arial, Helvetica, sans-serif; 
+            min-height: 297mm;
+            box-sizing: border-box;
+            position: relative;
+        }
+        .invoice-title, .report-title { 
+            text-align: center; 
+            font-size: 26px; 
+            font-weight: bold; 
+            text-decoration: underline; 
+            letter-spacing: 2px; 
+            margin-bottom: 30px; 
+        }
+        .maroon-header { 
+            background-color: var(--maroon-primary); 
+            color: #ffffff; 
+            font-weight: bold; 
+            padding: 6px 12px; 
+            font-size: 13px; 
+            border: 1px solid var(--maroon-primary); 
+        }
+        .client-box { 
+            border: 1px solid #000000; 
+            padding: 10px 12px; 
+            font-size: 13px; 
+            line-height: 1.6; 
+            min-height: 115px; 
+        }
+        .table-meta { 
+            font-size: 13px; 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .table-meta td { 
+            border: 1px solid #000000; 
+            padding: 6px 10px; 
+        }
+        .table-meta tr td:first-child {
+            background-color: #fcfcfc;
+            font-weight: bold;
+            width: 42%;
+        }
+        .table-items { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 25px; 
+            font-size: 13px; 
+        }
+        .table-items th { 
+            background-color: var(--maroon-primary); 
+            color: #ffffff; 
+            border: 1px solid #000000; 
+            padding: 10px 8px; 
+            text-align: center; 
+        }
+        .table-items td { 
+            border: 1px solid #000000; 
+            padding: 10px 8px; 
+        }
+        .grand-total-box { 
+            border: 2px solid #000000; 
+            font-weight: bold; 
+            font-size: 15px; 
+            padding: 8px 12px; 
+            text-align: right; 
+            background-color: #fcfcfc; 
+        }
+        .bank-title { 
+            background-color: var(--maroon-primary); 
+            color: #ffffff; 
+            font-weight: bold; 
+            padding: 4px 12px; 
+            width: fit-content; 
+            font-size: 13px; 
+            margin-bottom: 8px; 
+        }
+        .signature-container { 
+            font-size: 13px; 
+            text-align: right; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            align-items: flex-end; 
+            min-height: 130px; 
+        }
+        .signature-line { 
+            font-weight: bold; 
+            text-decoration: underline; 
+            margin-right: 10px;
+        }
+        .sticky-sidebar {
+            position: sticky;
+            top: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .app-panel {
+            display: none;
+        }
+        .app-panel.active {
+            display: block;
+        }
+        .img-preview {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        .btn-xs {
+            padding: 2px 6px;
+            font-size: 11px;
+            border-radius: 4px;
+        }
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                display: block;
+            }
+            .sidebar-brand {
+                text-align: center;
+                padding: 12px;
+                font-size: 14px;
+            }
+            .sidebar-menu {
+                display: flex;
+                flex-wrap: wrap;
+                margin: 0;
+                padding: 0;
+                justify-content: center;
+                background-color: #171a21;
+            }
+            .sidebar-menu li {
+                flex: 1 1 auto;
+                text-align: center;
+            }
+            .sidebar-menu li a {
+                padding: 10px 8px;
+                font-size: 11px;
+                flex-direction: column;
+                justify-content: center;
+            }
+            .sidebar-menu li a i {
+                margin-right: 0;
+                margin-bottom: 4px;
+                font-size: 14px;
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 12px;
+            }
+            .invoice-paper, .report-paper {
+                padding: 20px 15px;
+                min-height: auto;
+                overflow-x: auto;
+                font-size: 11px;
+            }
+            .invoice-title, .report-title {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+            .table-meta {
+                margin-top: 15px;
+            }
+            canvas { max-height: 220px !important; }
+        }
+
+        @media print {
+            .sidebar, .no-print { display: none !important; }
+            .main-content { margin-left: 0; padding: 0; }
+            .invoice-paper, .report-paper { border: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar no-print">
+        <div class="sidebar-brand">
+            <i class="fa-solid fa-layer-group me-2"></i>ADMIN SYSTEM V3 PRO
+        </div>
+        <ul class="sidebar-menu">
+            <li id="menu-dashboard" class="active"><a href="#" onclick="switchPanel('dashboard')"><i class="fa-solid fa-chart-pie"></i>Dashboard & Backup</a></li>
+            <li id="menu-invoice"><a href="#" onclick="switchPanel('invoice')"><i class="fa-solid fa-file-invoice-dollar"></i>Invoice Manual</a></li>
+            <li id="menu-reports"><a href="#" onclick="switchPanel('reports')"><i class="fa-solid fa-clipboard-list"></i>Laporan Kerja Harian</a></li>
+            <li id="menu-wages"><a href="#" onclick="switchPanel('wages')"><i class="fa-solid fa-users-gear"></i>Gaji & Upah Pekerja</a></li>
+            <li id="menu-cash"><a href="#" onclick="switchPanel('cash')"><i class="fa-solid fa-wallet"></i>Manajemen Kas Kecil</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        
+        <div id="panel-dashboard" class="app-panel active">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h4 class="fw-bold m-0"><i class="fa-solid fa-chart-pie text-muted me-2"></i>Ringkasan Dashboard Pro</h4>
+                <div>
+                    <button class="btn btn-danger btn-sm fw-bold me-2" onclick="resetAllData()">
+                        <i class="fa-solid fa-trash-can me-1"></i> Reset Semua Data
+                    </button>
+                    <button class="btn btn-success btn-sm fw-bold" onclick="simulateSpreadsheetSync()">
+                        <i class="fa-solid fa-file-excel me-1"></i> Sinkronisasi Spreadsheet
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card p-3 bg-white">
+                        <small class="text-muted fw-bold text-uppercase">Total Piutang Invoice</small>
+                        <h3 class="fw-bold mt-1 text-primary" id="dashTotalInvoice">Rp 0</h3>
+                        <small class="text-muted" id="dashCountInvoice">0 berkas tersimpan</small>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card p-3 bg-white">
+                        <small class="text-muted fw-bold text-uppercase">Saldo Kas Kecil</small>
+                        <h3 class="fw-bold mt-1 text-success" id="dashTotalCash">Rp 0</h3>
+                        <small class="text-muted">Real-time mutation</small>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card p-3 bg-white">
+                        <small class="text-muted fw-bold text-uppercase">Total Gaji Pekerja</small>
+                        <h3 class="fw-bold mt-1 text-danger" id="dashTotalWages">Rp 0</h3>
+                        <small class="text-muted">Alokasi beban upah</small>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="card p-3 bg-white">
+                        <small class="text-muted fw-bold text-uppercase">Laporan Kerja Lapangan</small>
+                        <h3 class="fw-bold mt-1 text-dark" id="dashTotalReports">0 Laporan</h3>
+                        <small class="text-muted">Dokumentasi progres</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12 col-lg-8 mb-4">
+                    <div class="card p-4 bg-white">
+                        <h6 class="fw-bold mb-3">Grafik Perbandingan Finansial Akumulatif (Rp)</h6>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="financialChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4 mb-4">
+                    <div class="card p-4 bg-white h-100">
+                        <h6 class="fw-bold mb-2"><i class="fa-solid fa-database text-warning me-1"></i>Pusat Keselamatan Data</h6>
+                        <p class="text-muted small">Amankan database administrasi Anda dari resiko terhapus otomatis oleh sistem pembersihan cache browser.</p>
+                        
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-primary btn-sm fw-bold" onclick="eksporSeluruhDatabase()"><i class="fa-solid fa-download me-2"></i>Download Backup (.JSON)</button>
+                            <label class="btn btn-outline-dark btn-sm fw-bold m-0 text-center cursor-pointer">
+                                <i class="fa-solid fa-upload me-2"></i>Restore / Muat Backup
+                                <input type="file" id="importFileBtn" accept=".json" style="display:none;" onchange="imporSeluruhDatabase(event)">
+                            </label>
+                        </div>
+                        <hr>
+                        <div class="p-3 bg-light rounded text-center border">
+                            <i class="fa-solid fa-cloud-arrow-up fa-2x text-success mb-2"></i>
+                            <div class="small fw-bold">Cloud-Sync Status</div>
+                            <small class="text-muted d-block mt-1" id="syncTime">Belum tersinkronisasi hari ini</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-invoice" class="app-panel">
+            <div class="row">
+                <div class="col-12 col-xl-5 no-print mb-4">
+                    <div class="card p-4 bg-white sticky-sidebar">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0 text-dark"><i class="fa-solid fa-file-invoice-dollar text-danger me-2"></i>Invoice Builder</h5>
+                            <div>
+                                <button type="button" class="btn btn-success btn-sm fw-bold me-1" onclick="simpanInvoiceKeRiwayat()"><i class="fa-solid fa-floppy-disk me-1"></i>Simpan</button>
+                                <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="unduhPDFInvoice()"><i class="fa-solid fa-print"></i> PDF</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="inIdHidden" value="">
+                        
+                        <form id="invoiceForm" onsubmit="event.preventDefault();">
+                            <div class="form-section-title">Informasi Header & Tujuan</div>
+                            <div class="row g-2">
+                                <div class="col-6 mb-2">
+                                    <label class="form-label small mb-1">Nomor Invoice</label>
+                                    <input type="text" class="form-control form-control-sm fw-bold text-danger" id="inNo" placeholder="001/INV/II/2026" oninput="liveRenderInvoicePreview()">
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <label class="form-label small mb-1">Nama Kapal / Unit</label>
+                                    <input type="text" class="form-control form-control-sm" id="inKapal" placeholder="KM. ICON FILIPI" oninput="liveRenderInvoicePreview()">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Nama Perusahaan</label>
+                                <input type="text" class="form-control form-control-sm text-uppercase fw-bold" id="inKepada" placeholder="PT. INDO CONTAINER LINE" oninput="liveRenderInvoicePreview()">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Alamat Tujuan</label>
+                                <textarea class="form-control form-control-sm" id="inAlamat" rows="2" placeholder="Alamat lengkap..." oninput="liveRenderInvoicePreview()"></textarea>
+                            </div>
+                            
+                            <div class="form-section-title">Tanggal & Kontrak</div>
+                            <div class="row g-2">
+                                <div class="col-6 mb-2">
+                                    <label class="form-label small mb-1">Tanggal Invoice</label>
+                                    <input type="date" class="form-control form-control-sm" id="inTgl" onchange="liveRenderInvoicePreview()">
+                                </div>
+                                <div class="col-6 mb-2">
+                                    <label class="form-label small mb-1">Due Date</label>
+                                    <input type="date" class="form-control form-control-sm" id="inTempo" onchange="liveRenderInvoicePreview()">
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">No. Kontrak / SPK</label>
+                                <input type="text" class="form-control form-control-sm" id="inKontrak" placeholder="004/SPK/ICON-MTC/II/2026" oninput="liveRenderInvoicePreview()">
+                            </div>
+
+                            <div class="form-section-title d-flex justify-content-between align-items-center">
+                                <span>Rincian Nominal Pekerjaan</span>
+                                <button type="button" class="btn btn-dark btn-xs" onclick="tambahBarisItemInvoice('', 1, 0, false)"><i class="fa-solid fa-plus me-1"></i>Tambah Baris</button>
+                            </div>
+                            <div id="formItemContainer"></div>
+
+                            <div class="form-section-title">Informasi Rekening Bank</div>
+                            <div class="row g-2">
+                                <div class="col-4 mb-2">
+                                    <label class="form-label small mb-1">Nama Bank</label>
+                                    <input type="text" class="form-control form-control-sm" id="inBankNama" oninput="liveRenderInvoicePreview()">
+                                </div>
+                                <div class="col-4 mb-2">
+                                    <label class="form-label small mb-1">Atas Nama</label>
+                                    <input type="text" class="form-control form-control-sm" id="inBankAn" oninput="liveRenderInvoicePreview()">
+                                </div>
+                                <div class="col-4 mb-2">
+                                    <label class="form-label small mb-1">No. Rekening</label>
+                                    <input type="text" class="form-control form-control-sm" id="inBankRek" oninput="liveRenderInvoicePreview()">
+                                </div>
+                            </div>
+
+                            <div class="form-section-title">Lokasi & Penandatangan</div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Kota & Tanggal TTD</label>
+                                    <input type="text" class="form-control form-control-sm" id="inKotaTgl" oninput="liveRenderInvoicePreview()">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small mb-1">Nama Jelas TTD</label>
+                                    <input type="text" class="form-control form-control-sm" id="inNamaTid" oninput="liveRenderInvoicePreview()">
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="form-section-title mt-4 text-primary"><i class="fa-solid fa-folder-open me-1"></i> Riwayat Database Invoice Terdaftar</div>
+                        <div class="table-responsive" style="max-height: 200px; overflow-y:auto;">
+                            <table class="table table-sm table-bordered bg-light small mb-0">
+                                <thead class="table-secondary">
+                                    <tr><th>No Invoice</th><th>Kapal</th><th class="text-center" width="25%">Aksi</th></tr>
+                                </thead>
+                                <tbody id="historyInvoiceTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-7">
+                    <div id="invoicePrintArea" class="invoice-paper shadow-sm">
+                        <div class="invoice-title">INVOICE</div>
+                        <div class="row g-3">
+                            <div class="col-7">
+                                <div class="maroon-header" id="outNo">Nomor -</div>
+                                <div class="client-box">
+                                    <strong>Kepada Yth,</strong><br>
+                                    <span id="outKepada" style="font-weight: bold; text-transform: uppercase;">-</span><br>
+                                    <span id="outAlamat">-</span>
+                                </div>
+                            </div>
+                            <div class="col-5">
+                                <table class="table-meta">
+                                    <tr><td>Tanggal Invoice</td><td id="outTgl">-</td></tr>
+                                    <tr><td>Due Date</td><td id="outTempo">-</td></tr>
+                                    <tr><td>No. Kontrak</td><td id="outKontrak">-</td></tr>
+                                    <tr><td>Nama Kapal / Unit</td><td id="outKapal" style="font-weight: bold; color: var(--maroon-primary);">-</td></tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <table class="table-items">
+                            <thead><tr><th width="6%">NO</th><th width="52%">DESKRIPSI</th><th width="10%">QTY</th><th width="14%">HARGA</th><th width="18%">TOTAL HARGA</th></tr></thead>
+                            <tbody id="outTableBody"></tbody>
+                        </table>
+
+                        <div class="row mt-2 justify-content-end">
+                            <div class="col-6 text-end" style="line-height: 2;">
+                                <div class="row"><div class="col-6 fw-bold">SUBTOTAL</div><div class="col-6 pe-3" id="outSubtotal">Rp 0</div></div>
+                                <div class="row mt-1 align-items-center"><div class="col-6 fw-bold text-end pe-3">GRAND TOTAL</div><div class="col-6"><div class="grand-total-box" id="outGrandTotal">Rp 0</div></div></div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <div class="bank-title">Informasi Transfer Bank :</div>
+                                <table class="table-bank-info small">
+                                    <tr><td width="35%">Bank</td><td>: <span id="outBankNama">-</span></td></tr>
+                                    <tr><td>Atas Nama</td><td>: <span id="outBankAn">-</span></td></tr>
+                                    <tr><td>No. Rekening</td><td>: <span id="outBankRek">-</span></td></tr>
+                                </table>
+                            </div>
+                            <div class="col-6 text-end">
+                                <div class="signature-container"><div id="outKotaTgl">-</div><div class="signature-line" id="outNamaTid">-</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-reports" class="app-panel">
+            <div class="row">
+                <div class="col-12 col-xl-5 no-print mb-4">
+                    <div class="card p-4 bg-white sticky-sidebar">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="fw-bold m-0 text-dark"><i class="fa-solid fa-clipboard-list text-danger me-2"></i>Report Builder</h5>
+                            <div>
+                                <button type="button" class="btn btn-success btn-sm fw-bold me-1" onclick="simpanLaporanKerjaKeRiwayat()"><i class="fa-solid fa-floppy-disk me-1"></i>Simpan</button>
+                                <button type="button" class="btn btn-danger btn-sm fw-bold" onclick="unduhPDFLaporan()"><i class="fa-solid fa-print"></i> PDF</button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="repIdHidden" value="">
+                        
+                        <form id="reportForm" onsubmit="event.preventDefault();">
+                            <div class="form-section-title">Header Laporan Lapangan</div>
+                            <div class="mb-2">
+                                <label class="form-label small mb-1">Hubungkan Link Ref Invoice / Proyek Kapal</label>
+                                <select class="form-select form-select-sm dynamic-invoice-select" id="repRef" onchange="liveRenderReportPreview()"></select>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6 mb-2"><label class="form-label small mb-1">Tanggal Aktivitas</label><input type="date" class="form-control form-control-sm" id="repTgl" onchange="liveRenderReportPreview()"></div>
+                                <div class="col-6 mb-2"><label class="form-label small mb-1">Nama Pengawas / Teknisi</label><input type="text" class="form-control form-control-sm" id="repPengawas" placeholder="Misal: Ricky A." oninput="liveRenderReportPreview()"></div>
+                            </div>
+                            <div class="form-section-title d-flex justify-content-between align-items-center"><span>Daftar Aktivitas & Dokumentasi</span><button type="button" class="btn btn-dark btn-xs" onclick="tambahBarisItemLaporan('', '')"><i class="fa-solid fa-plus me-1"></i>Tambah Pekerjaan</button></div>
+                            <div id="formReportItemContainer"></div>
+                        </form>
+
+                        <div class="form-section-title mt-4 text-primary"><i class="fa-solid fa-folder-open me-1"></i> Riwayat Dokumen Laporan Harian</div>
+                        <div class="table-responsive" style="max-height: 180px; overflow-y:auto;">
+                            <table class="table table-sm table-bordered bg-light small mb-0">
+                                <thead class="table-secondary"><tr><th>Tanggal Log</th><th>Proyek Ref</th><th class="text-center" width="25%">Aksi</th></tr></thead>
+                                <tbody id="historyReportTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-xl-7">
+                    <div id="reportPrintArea" class="report-paper shadow-sm">
+                        <div class="report-title">DAILY WORK REPORT</div>
+                        <div class="row g-3 mb-4"><div class="col-12"><div class="maroon-header">INFORMASI AKTIVITAS LAPANGAN</div><table class="table-meta"><tr><td width="35%">Tanggal Pekerjaan</td><td id="outRepTgl">-</td></tr><tr><td>Referensi Hubungan Proyek</td><td id="outRepRef" style="font-weight: bold; color: var(--maroon-primary);">-</td></tr><tr><td>Teknisi / Pengawas Lapangan</td><td id="outRepPengawas">-</td></tr></table></div></div>
+                        <div class="maroon-header mb-2">LOG RINCIAN PENANGANAN & PROGRES FISIK</div>
+                        <div id="outReportItemsContainer"></div>
+                        <div class="row mt-5"><div class="col-6"></div><div class="col-6 text-end"><div class="signature-container"><div>Dibuat Oleh,</div><div class="signature-line" id="outRepSignNama">-</div></div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="panel-wages" class="app-panel">
+            <div class="card p-4 bg-white">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-users-gear text-danger me-2"></i>Perhitungan Gaji & Upah Pekerja</h5>
+                
+                <div class="p-3 bg-light rounded border mb-4">
+                    <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-calculator text-primary me-1"></i> Kalkulator Sisa Upah Proyek (Otomatis)</h6>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small mb-1 fw-bold">Pilih Referensi Invoice Proyek</label>
+                            <select class="form-select form-select-sm dynamic-invoice-select" id="wagCalcRef" onchange="hitungOtomatisUpah()"></select>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label small mb-1 fw-bold">Jumlah Teknisi On-Site (Orang)</label>
+                            <input type="number" class="form-control form-control-sm" id="wagCalcPekerja" min="1" value="1" oninput="hitungOtomatisUpah()">
+                        </div>
+                    </div>
+                    <div class="row mt-3 g-2 text-dark small border-top pt-2">
+                        <div class="col-6 col-md-3">Total Invoice: <br><strong id="calcTotalInv">Rp 0</strong></div>
+                        <div class="col-6 col-md-3">Potongan PPh 2%: <br><strong id="calcPph" class="text-danger">Rp 0</strong></div>
+                        <div class="col-6 col-md-3">Potongan Petty Cash: <br><strong id="calcPetty" class="text-danger">Rp 0</strong></div>
+                        <div class="col-6 col-md-3">Sisa Bersih Upah: <br><strong id="calcSisa" class="text-success fw-bold fs-6">Rp 0</strong></div>
+                    </div>
+                </div>
+
+                <form id="wageForm" onsubmit="simpanGajiPekerja(event)">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Nama Pekerja / Teknisi</label><input type="text" class="form-control form-control-sm" id="wagNama" placeholder="Nama lengkap" required></div>
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Peran / Jabatan</label><input type="text" class="form-control form-control-sm" id="wagPeran" placeholder="Misal: Teknisi Utama" required></div>
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Hubungkan Beban Proyek Invoice</label><select class="form-select form-select-sm dynamic-invoice-select" id="wagRef" required></select></div>
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Nominal Upah Kerja (Rp)</label><input type="number" class="form-control form-control-sm" id="wagJumlah" placeholder="0" required></div>
+                        <div class="col-12 text-end mt-2"><button type="submit" class="btn btn-danger btn-sm fw-bold"><i class="fa-solid fa-calculator me-1"></i> Catat Pengeluaran Gaji</button></div>
+                    </div>
+                </form>
+                <div class="form-section-title mt-4">Breakdown Pengeluaran Upah Kerja per Invoice Proyek</div>
+                <div class="table-responsive"><table class="table table-bordered table-sm small bg-white mt-2"><thead class="table-dark"><tr><th>Nama Lengkap Pekerja</th><th>Peran Jabatan</th><th>Link Ref Invoice</th><th class="text-end">Nominal Bersih</th><th width="8%" class="text-center">Aksi</th></tr></thead><tbody id="wageTableBody"></tbody></table></div>
+            </div>
+        </div>
+
+        <div id="panel-cash" class="app-panel">
+            <div class="card p-4 bg-white">
+                <h5 class="fw-bold mb-3"><i class="fa-solid fa-wallet text-danger me-2"></i>Manajemen Kas Kecil (Petty Cash)</h5>
+                <form id="cashForm" onsubmit="simpanKasKecil(event)">
+                    <div class="row g-2">
+                        <div class="col-12 col-md-2"><label class="form-label small mb-1">Tanggal</label><input type="date" class="form-control form-control-sm" id="cashTgl" required></div>
+                        <div class="col-12 col-md-2"><label class="form-label small mb-1">Jenis Mutasi</label><select class="form-select form-select-sm" id="cashJenis" required><option value="MASUK">Pemasukan (+)</option><option value="KELUAR">Pengeluaran (-)</option></select></div>
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Link Ref Proyek (Opsional)</label><select class="form-select form-select-sm dynamic-invoice-select" id="cashRef"></select></div>
+                        <div class="col-12 col-md-3"><label class="form-label small mb-1">Keterangan Aktivitas Operasional</label><input type="text" class="form-control form-control-sm" id="cashDesc" placeholder="Beli ATK Kantor / Konsumsi tim" required></div>
+                        <div class="col-12 col-md-2"><label class="form-label small mb-1">Nominal (Rp)</label><input type="number" class="form-control form-control-sm" id="cashJumlah" placeholder="0" required></div>
+                        <div class="col-12 text-end mt-2"><button type="submit" class="btn btn-danger btn-sm fw-bold"><i class="fa-solid fa-plus me-1"></i> Input Transaksi Buku Kas</button></div>
+                    </div>
+                </form>
+                <div class="form-section-title mt-4 d-flex justify-content-between align-items-center"><span>Buku Kas & Log Mutasi Saldo Utama</span><span class="badge bg-success fs-6" id="cashRunningBalance">Saldo Akhir: Rp 0</span></div>
+                <div class="table-responsive"><table class="table table-bordered table-sm small bg-white mt-2"><thead class="table-dark"><tr><th width="12%">Tanggal</th><th width="10%">Jenis</th><th width="20%">Link Ref Invoice</th><th>Keterangan Operasional</th><th width="15%" class="text-end">Pemasukan (+)</th><th width="15%" class="text-end">Pengeluaran (-)</th><th width="6%" class="text-center">Aksi</th></tr></thead><tbody id="cashTableBody"></tbody></table></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let finChartInstance = null;
+
+        function switchPanel(panelId) {
+            document.querySelectorAll('.app-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(l => l.classList.remove('active'));
+            document.getElementById('panel-' + panelId).classList.add('active');
+            document.getElementById('menu-' + panelId).classList.add('active');
+            if(panelId === 'dashboard') hitungDanUpdateDashboard();
+            if(panelId === 'wages') hitungOtomatisUpah();
+        }
+
+        function formatIdr(num) { return "Rp " + new Intl.NumberFormat("id-ID").format(num); }
+        function formatTanggalIndo(dateStr) { if (!dateStr) return "-"; const d = new Date(dateStr); return isNaN(d.getTime()) ? "-" : d.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }); }
+
+        // ================= INVOICE LOGIC =================
+        function tambahBarisItemInvoice(desc = "", qty = 1, harga = 0, skip = false) {
+            const container = document.getElementById('formItemContainer');
+            const div = document.createElement('div');
+            div.className = "row g-1 mb-2 align-items-center item-row-input";
+            div.innerHTML = `<div class="col-6"><input type="text" class="form-control form-control-sm field-desc" value="${desc.replace(/"/g, '&quot;')}" placeholder="Rincian Pekerjaan" oninput="liveRenderInvoicePreview()"></div><div class="col-2"><input type="number" class="form-control form-control-sm text-center field-qty" value="${qty}" min="0" step="any" oninput="liveRenderInvoicePreview()"></div><div class="col-3"><input type="number" class="form-control form-control-sm field-harga" value="${harga}" min="0" oninput="liveRenderInvoicePreview()"></div><div class="col-1 text-center"><button type="button" class="text-danger border-0 bg-transparent" onclick="this.closest('.item-row-input').remove(); liveRenderInvoicePreview();"><i class="fa-solid fa-trash-can"></i></button></div>`;
+            container.appendChild(div);
+            if(!skip) liveRenderInvoicePreview();
+        }
+
+        function liveRenderInvoicePreview() {
+            let subtotal = 0;
+            const tbody = document.getElementById('outTableBody');
+            tbody.innerHTML = "";
+            let idx = 1;
+            document.querySelectorAll('.item-row-input').forEach(row => {
+                const desc = row.querySelector('.field-desc').value || "-";
+                const qty = parseFloat(row.querySelector('.field-qty').value) || 0;
+                const harga = parseFloat(row.querySelector('.field-harga').value) || 0;
+                const total = qty * harga;
+                subtotal += total;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="text-center">${idx++}</td><td>${desc}</td><td class="text-center">${qty}</td><td class="text-end">${new Intl.NumberFormat("id-ID").format(harga)}</td><td class="text-end">${new Intl.NumberFormat("id-ID").format(total)}</td>`;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('outSubtotal').innerText = formatIdr(subtotal);
+            document.getElementById('outGrandTotal').innerText = formatIdr(subtotal);
+            document.getElementById('outNo').innerText = "Nomor " + (document.getElementById('inNo').value || "-");
+            document.getElementById('outKapal').innerText = document.getElementById('inKapal').value || "-";
+            document.getElementById('outKepada').innerText = document.getElementById('inKepada').value || "-";
+            document.getElementById('outAlamat').innerText = document.getElementById('inAlamat').value || "-";
+            document.getElementById('outTgl').innerText = formatTanggalIndo(document.getElementById('inTgl').value);
+            document.getElementById('outTempo').innerText = formatTanggalIndo(document.getElementById('inTempo').value);
+            document.getElementById('outKontrak').innerText = document.getElementById('inKontrak').value || "-";
+            document.getElementById('outBankNama').innerText = document.getElementById('inBankNama').value || "-";
+            document.getElementById('outBankAn').innerText = document.getElementById('inBankAn').value || "-";
+            document.getElementById('outBankRek').innerText = document.getElementById('inBankRek').value || "-";
+            document.getElementById('outKotaTgl').innerText = document.getElementById('inKotaTgl').value || "-";
+            document.getElementById('outNamaTid').innerText = document.getElementById('inNamaTid').value || "-";
+        }
+
+        function resetFormInvoice() {
+            document.getElementById('inIdHidden').value = "";
+            document.getElementById('inNo').value = "";
+            document.getElementById('inKapal').value = "";
+            document.getElementById('inKepada').value = "";
+            document.getElementById('inAlamat').value = "";
+            document.getElementById('inTgl').value = "";
+            document.getElementById('inTempo').value = "";
+            document.getElementById('inKontrak').value = "";
+            document.getElementById('inBankNama').value = "";
+            document.getElementById('inBankAn').value = "";
+            document.getElementById('inBankRek').value = "";
+            document.getElementById('inKotaTgl').value = "";
+            document.getElementById('inNamaTid').value = "";
+            document.getElementById('formItemContainer').innerHTML = "";
+            tambahBarisItemInvoice("", 1, 0, true);
+            liveRenderInvoicePreview();
+        }
+
+        function resetFormReport() {
+            document.getElementById('repIdHidden').value = "";
+            document.getElementById('repTgl').value = "";
+            document.getElementById('repRef').value = "UMUM / NON-INVOICE";
+            document.getElementById('repPengawas').value = "";
+            document.getElementById('formReportItemContainer').innerHTML = "";
+            tambahBarisItemLaporan("", "");
+            liveRenderReportPreview();
+        }
+
+        function simpanInvoiceKeRiwayat() {
+            const noVal = document.getElementById('inNo').value.trim();
+            if(!noVal) { alert("Nomor Invoice wajib diisi!"); return; }
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            let idHidden = document.getElementById('inIdHidden').value;
+            const items = [];
+            document.querySelectorAll('.item-row-input').forEach(row => {
+                const desc = row.querySelector('.field-desc').value || "-";
+                const qty = parseFloat(row.querySelector('.field-qty').value) || 0;
+                const harga = parseFloat(row.querySelector('.field-harga').value) || 0;
+                items.push({ desc, qty, harga });
+            });
+            const subtotal = items.reduce((sum, i) => sum + (i.qty * i.harga), 0);
+            const invData = {
+                id: idHidden ? parseInt(idHidden) : Date.now(),
+                no: noVal, kapal: document.getElementById('inKapal').value, kepada: document.getElementById('inKepada').value,
+                alamat: document.getElementById('inAlamat').value, tgl: document.getElementById('inTgl').value,
+                tempo: document.getElementById('inTempo').value, kontrak: document.getElementById('inKontrak').value,
+                bankNama: document.getElementById('inBankNama').value, bankAn: document.getElementById('inBankAn').value,
+                bankRek: document.getElementById('inBankRek').value, kotaTgl: document.getElementById('inKotaTgl').value,
+                namaTid: document.getElementById('inNamaTid').value, grandTotal: subtotal, items: items
+            };
+            if(idHidden) { const idx = invoices.findIndex(i => i.id === parseInt(idHidden)); if(idx !== -1) invoices[idx] = invData; }
+            else invoices.push(invData);
+            localStorage.setItem('sys_invoices', JSON.stringify(invoices));
+            document.getElementById('inIdHidden').value = invData.id;
+            renderInvoiceHistoryList();
+            updateDynamicSelectOptions();
+            hitungDanUpdateDashboard();
+            alert("Invoice berhasil disimpan!");
+        }
+
+        function renderInvoiceHistoryList() {
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            const tbody = document.getElementById('historyInvoiceTableBody');
+            tbody.innerHTML = "";
+            invoices.forEach(inv => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td><span class="text-danger fw-bold small">${inv.no}</span></td><td><small>${inv.kapal || '-'}</small></td><td class="text-center"><button class="btn btn-xs btn-primary me-1" onclick="loadInvoiceFromHistory(${inv.id})"><i class="fa-solid fa-folder-open"></i></button><button class="btn btn-xs btn-danger" onclick="hapusInvoiceFromHistory(${inv.id})"><i class="fa-solid fa-trash"></i></button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function loadInvoiceFromHistory(id) {
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            const data = invoices.find(i => i.id === id);
+            if(!data) return;
+            document.getElementById('inIdHidden').value = data.id;
+            document.getElementById('inNo').value = data.no || "";
+            document.getElementById('inKapal').value = data.kapal || "";
+            document.getElementById('inKepada').value = data.kepada || "";
+            document.getElementById('inAlamat').value = data.alamat || "";
+            document.getElementById('inTgl').value = data.tgl || "";
+            document.getElementById('inTempo').value = data.tempo || "";
+            document.getElementById('inKontrak').value = data.kontrak || "";
+            document.getElementById('inBankNama').value = data.bankNama || "";
+            document.getElementById('inBankAn').value = data.bankAn || "";
+            document.getElementById('inBankRek').value = data.bankRek || "";
+            document.getElementById('inKotaTgl').value = data.kotaTgl || "";
+            document.getElementById('inNamaTid').value = data.namaTid || "";
+            document.getElementById('formItemContainer').innerHTML = "";
+            if(data.items && data.items.length > 0) data.items.forEach(it => tambahBarisItemInvoice(it.desc, it.qty, it.harga, true));
+            else tambahBarisItemInvoice("", 1, 0, true);
+            liveRenderInvoicePreview();
+        }
+
+        function hapusInvoiceFromHistory(id) {
+            if(confirm("Hapus data invoice ini?")) {
+                let invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+                invoices = invoices.filter(i => i.id !== id);
+                localStorage.setItem('sys_invoices', JSON.stringify(invoices));
+                renderInvoiceHistoryList();
+                updateDynamicSelectOptions();
+                hitungDanUpdateDashboard();
+                if(document.getElementById('inIdHidden').value == id) resetFormInvoice();
+            }
+        }
+
+        function unduhPDFInvoice() {
+            const script = document.createElement('script');
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+            script.onload = () => { html2pdf().set({ margin: [10,10,10,10], filename: `Invoice_${document.getElementById('inNo').value || 'Manual'}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2.5 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('invoicePrintArea')).save(); };
+            document.head.appendChild(script);
+        }
+
+        function updateDynamicSelectOptions() {
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            document.querySelectorAll('.dynamic-invoice-select').forEach(select => {
+                const savedVal = select.value;
+                select.innerHTML = "";
+                
+                if (select.id !== "wagCalcRef") {
+                    const defaultOpt = document.createElement('option'); defaultOpt.value = "UMUM / NON-INVOICE"; defaultOpt.text = "UMUM / NON-INVOICE"; select.appendChild(defaultOpt);
+                } else {
+                    const defaultOpt = document.createElement('option'); defaultOpt.value = ""; defaultOpt.text = "-- Pilih Invoice --"; select.appendChild(defaultOpt);
+                }
+                
+                invoices.forEach(inv => { 
+                    const opt = document.createElement('option'); 
+                    opt.value = `${inv.no} (${inv.kapal || 'No Name'})`; 
+                    opt.text = `${inv.no} - ${inv.kapal || 'Tanpa Kapal'}`; 
+                    select.appendChild(opt); 
+                });
+                if(savedVal) select.value = savedVal;
+            });
+        }
+
+        // ================= LOGIKA HITUNG UPAH BARU =================
+        function hitungOtomatisUpah() {
+            const refVal = document.getElementById('wagCalcRef').value;
+            const jmlPekerja = parseInt(document.getElementById('wagCalcPekerja').value) || 0;
+            
+            if (!refVal) {
+                document.getElementById('calcTotalInv').innerText = "Rp 0";
+                document.getElementById('calcPph').innerText = "Rp 0";
+                document.getElementById('calcPetty').innerText = "Rp 0";
+                document.getElementById('calcSisa').innerText = "Rp 0";
+                return;
+            }
+            
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            const found = invoices.find(inv => refVal.startsWith(inv.no));
+            
+            if (!found) return;
+            
+            const totalInvoice = found.grandTotal || 0;
+            const pph = totalInvoice * 0.02; // PPh 2%
+            
+            // Aturan Petty Cash Teknisi
+            let pettyCash = 0;
+            if (jmlPekerja >= 1 && jmlPekerja <= 2) {
+                pettyCash = 100000;
+            } else if (jmlPekerja >= 3 && jmlPekerja <= 4) {
+                pettyCash = 50000;
+            } else if (jmlPekerja > 4) {
+                pettyCash = 0; 
+            }
+            
+            const sisaUpah = totalInvoice - pph - pettyCash;
+            
+            document.getElementById('calcTotalInv').innerText = formatIdr(totalInvoice);
+            document.getElementById('calcPph').innerText = formatIdr(pph);
+            document.getElementById('calcPetty').innerText = formatIdr(pettyCash);
+            document.getElementById('calcSisa').innerText = formatIdr(sisaUpah > 0 ? sisaUpah : 0);
+            
+            document.getElementById('wagJumlah').value = sisaUpah > 0 ? Math.round(sisaUpah) : 0;
+            document.getElementById('wagRef').value = refVal;
+        }
+
+        // ================= LAPORAN HARIAN =================
+        function tambahBarisItemLaporan(desc = "", fotoBase64 = "") {
+            const container = document.getElementById('formReportItemContainer');
+            const rowId = 'rep_row_' + Date.now() + Math.random().toString(36).substr(2, 5);
+            const div = document.createElement('div');
+            div.className = "p-3 mb-3 border rounded bg-light report-item-row";
+            div.id = rowId;
+            div.innerHTML = `<div class="d-flex justify-content-between align-items-center mb-1"><span class="fw-bold small text-secondary"><i class="fa-solid fa-wrench me-1"></i> Item Penanganan</span><button type="button" class="btn btn-link text-danger btn-sm p-0 text-decoration-none small" onclick="document.getElementById('${rowId}').remove(); liveRenderReportPreview();"><i class="fa-solid fa-trash-can"></i> Hapus</button></div><div class="mb-2"><textarea class="form-control form-control-sm field-rep-desc" rows="2" placeholder="Tulis rincian aktivitas / temuan kerusakan..." oninput="liveRenderReportPreview()">${desc.replace(/</g, '&lt;')}</textarea></div><div><input type="file" class="form-control form-control-sm" accept="image/*" onchange="prosesFotoBarisLaporan(this, '${rowId}')"><div class="mt-2 text-center row-img-preview-holder">${fotoBase64 ? `<img src="${fotoBase64}" class="img-preview" data-blob="${fotoBase64}" />` : ''}</div></div>`;
+            container.appendChild(div);
+            liveRenderReportPreview();
+        }
+
+        function prosesFotoBarisLaporan(input, rowId) {
+            const holder = document.getElementById(rowId).querySelector('.row-img-preview-holder');
+            if(input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { holder.innerHTML = `<img src="${e.target.result}" class="img-preview" data-blob="${e.target.result}" />`; liveRenderReportPreview(); };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function liveRenderReportPreview() {
+            document.getElementById('outRepTgl').innerText = formatTanggalIndo(document.getElementById('repTgl').value);
+            document.getElementById('outRepRef').innerText = document.getElementById('repRef').value || "-";
+            document.getElementById('outRepPengawas').innerText = document.getElementById('repPengawas').value || "-";
+            document.getElementById('outRepSignNama').innerText = document.getElementById('repPengawas').value || "-";
+            const containerPaper = document.getElementById('outReportItemsContainer');
+            containerPaper.innerHTML = "";
+            let num = 1;
+            document.querySelectorAll('.report-item-row').forEach(row => {
+                const desc = row.querySelector('.field-rep-desc').value || "-";
+                const imgEl = row.querySelector('.row-img-preview-holder img');
+                const imgSrc = imgEl ? imgEl.getAttribute('data-blob') : "";
+                const divBlock = document.createElement('div');
+                divBlock.style.borderBottom = "1px solid #000";
+                divBlock.style.padding = "15px 0";
+                divBlock.innerHTML = `<div class="row align-items-start"><div class="col-7" style="font-size:13px;"><strong>${num++}. PENANGANAN / AKTIVITAS:</strong><p style="white-space: pre-line; margin-top:5px;">${desc}</p></div><div class="col-5 text-center">${imgSrc ? `<img src="${imgSrc}" style="max-width:100%; max-height:160px; object-fit:contain; border:1px solid #000; padding:2px;" />` : '<span class="text-muted small"><i>Tanpa Dokumentasi Foto</i></span>'}</div></div>`;
+                containerPaper.appendChild(divBlock);
+            });
+        }
+
+        function simpanLaporanKerjaKeRiwayat() {
+            const tglVal = document.getElementById('repTgl').value;
+            if(!tglVal) { alert("Tanggal Laporan wajib!"); return; }
+            const list = JSON.parse(localStorage.getItem('sys_reports_v3') || "[]");
+            let idHidden = document.getElementById('repIdHidden').value;
+            const subItems = [];
+            document.querySelectorAll('.report-item-row').forEach(row => {
+                const desc = row.querySelector('.field-rep-desc').value || "";
+                const imgEl = row.querySelector('.row-img-preview-holder img');
+                const imgSrc = imgEl ? imgEl.getAttribute('data-blob') : "";
+                subItems.push({ desc, foto: imgSrc });
+            });
+            const rData = { id: idHidden ? parseInt(idHidden) : Date.now(), tgl: tglVal, ref: document.getElementById('repRef').value, pengawas: document.getElementById('repPengawas').value, items: subItems };
+            if(idHidden) { const idx = list.findIndex(l => l.id === parseInt(idHidden)); if(idx !== -1) list[idx] = rData; }
+            else list.push(rData);
+            try { localStorage.setItem('sys_reports_v3', JSON.stringify(list)); alert("Laporan tersimpan!"); } catch(e) { alert("Ukuran foto terlalu besar, tidak dapat simpan di localStorage. Namun PDF tetap bisa dicetak."); }
+            document.getElementById('repIdHidden').value = rData.id;
+            renderReportHistoryList();
+            hitungDanUpdateDashboard();
+        }
+
+        function renderReportHistoryList() {
+            const list = JSON.parse(localStorage.getItem('sys_reports_v3') || "[]");
+            const tbody = document.getElementById('historyReportTableBody');
+            tbody.innerHTML = "";
+            list.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td><small>${item.tgl}</small></td><td><span class="badge bg-secondary small">${item.ref.split(' ')[0]}</span></td><td class="text-center"><button class="btn btn-xs btn-primary me-1" onclick="loadReportFromHistory(${item.id})"><i class="fa-solid fa-folder-open"></i></button><button class="btn btn-xs btn-danger" onclick="hapusReportFromHistory(${item.id})"><i class="fa-solid fa-trash"></i></button></td>`; tbody.appendChild(tr); });
+        }
+
+        function loadReportFromHistory(id) {
+            const list = JSON.parse(localStorage.getItem('sys_reports_v3') || "[]");
+            const data = list.find(l => l.id === id);
+            if(!data) return;
+            document.getElementById('repIdHidden').value = data.id;
+            document.getElementById('repTgl').value = data.tgl || "";
+            document.getElementById('repRef').value = data.ref || "UMUM / NON-INVOICE";
+            document.getElementById('repPengawas').value = data.pengawas || "";
+            document.getElementById('formReportItemContainer').innerHTML = "";
+            if(data.items && data.items.length > 0) data.items.forEach(it => tambahBarisItemLaporan(it.desc, it.foto));
+            else tambahBarisItemLaporan("", "");
+            liveRenderReportPreview();
+        }
+
+        function hapusReportFromHistory(id) {
+            if(confirm("Hapus laporan ini?")) { let list = JSON.parse(localStorage.getItem('sys_reports_v3') || "[]"); list = list.filter(l => l.id !== id); localStorage.setItem('sys_reports_v3', JSON.stringify(list)); renderReportHistoryList(); hitungDanUpdateDashboard(); if(document.getElementById('repIdHidden').value == id) resetFormReport(); }
+        }
+
+        function unduhPDFLaporan() {
+            const script = document.createElement('script');
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+            script.onload = () => { html2pdf().set({ margin: [10,10,10,10], filename: `Laporan_Kerja_${document.getElementById('repTgl').value || 'Hari_ini'}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2.5 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).from(document.getElementById('reportPrintArea')).save(); };
+            document.head.appendChild(script);
+        }
+
+        // ================= WAGES LOGIC =================
+        function simpanGajiPekerja(e) {
+            e.preventDefault();
+            const list = JSON.parse(localStorage.getItem('sys_wages') || "[]");
+            list.push({ id: Date.now(), nama: document.getElementById('wagNama').value, peran: document.getElementById('wagPeran').value, ref: document.getElementById('wagRef').value, jumlah: parseFloat(document.getElementById('wagJumlah').value) || 0 });
+            localStorage.setItem('sys_wages', JSON.stringify(list));
+            document.getElementById('wageForm').reset();
+            renderWages();
+            hitungDanUpdateDashboard();
+            alert("Data gaji berhasil disimpan!");
+        }
+        function renderWages() {
+            const list = JSON.parse(localStorage.getItem('sys_wages') || "[]");
+            const tbody = document.getElementById('wageTableBody');
+            tbody.innerHTML = "";
+            list.forEach(item => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${item.nama}</td><td>${item.peran}</td><td><span class="badge bg-secondary">${item.ref}</span></td><td class="text-end fw-bold text-danger">${formatIdr(item.jumlah)}</td><td class="text-center"><button class="btn btn-link text-danger p-0" onclick="hapusWage(${item.id})"><i class="fa-solid fa-trash-can"></i></button></td>`; tbody.appendChild(tr); });
+        }
+        function hapusWage(id) { let list = JSON.parse(localStorage.getItem('sys_wages') || "[]"); list = list.filter(i => i.id !== id); localStorage.setItem('sys_wages', JSON.stringify(list)); renderWages(); hitungDanUpdateDashboard(); }
+
+        // ================= CASH LOGIC =================
+        function simpanKasKecil(e) {
+            e.preventDefault();
+            const list = JSON.parse(localStorage.getItem('sys_cash') || "[]");
+            list.push({ id: Date.now(), tgl: document.getElementById('cashTgl').value, jenis: document.getElementById('cashJenis').value, ref: document.getElementById('cashRef').value, desc: document.getElementById('cashDesc').value, jumlah: parseFloat(document.getElementById('cashJumlah').value) || 0 });
+            localStorage.setItem('sys_cash', JSON.stringify(list));
+            document.getElementById('cashForm').reset();
+            renderCash();
+            hitungDanUpdateDashboard();
+            alert("Transaksi kas berhasil disimpan!");
+        }
+        function renderCash() {
+            const list = JSON.parse(localStorage.getItem('sys_cash') || "[]");
+            const tbody = document.getElementById('cashTableBody');
+            tbody.innerHTML = "";
+            let runningBalance = 0;
+            list.forEach(item => { let masuk = 0, keluar = 0; if(item.jenis === 'MASUK') { masuk = item.jumlah; runningBalance += item.jumlah; } else { keluar = item.jumlah; runningBalance -= item.jumlah; } const tr = document.createElement('tr'); tr.innerHTML = `<td>${item.tgl}</td><td><span class="badge ${item.jenis === 'MASUK'?'bg-success':'bg-danger'}">${item.jenis}</span></td><td><small class="text-muted">${item.ref || 'UMUM'}</small></td><td>${item.desc}</td><td class="text-end text-success">${masuk?formatIdr(masuk):'-'}</td><td class="text-end text-danger">${keluar?formatIdr(keluar):'-'}</td><td class="text-center"><button class="btn btn-link text-danger p-0" onclick="hapusCash(${item.id})"><i class="fa-solid fa-trash-can"></i></button></td>`; tbody.appendChild(tr); });
+            document.getElementById('cashRunningBalance').innerText = `Saldo Akhir: ${formatIdr(runningBalance)}`;
+        }
+        function hapusCash(id) { let list = JSON.parse(localStorage.getItem('sys_cash') || "[]"); list = list.filter(i => i.id !== id); localStorage.setItem('sys_cash', JSON.stringify(list)); renderCash(); hitungDanUpdateDashboard(); }
+
+        // ================= GLOBAL RESET ALL DATA =================
+        function resetAllData() {
+            if(confirm("⚠️ PERINGATAN: Ini akan MENGHAPUS SEMUA data Invoice, Laporan, Gaji, dan Kas Kecil.\nData akan dikembalikan ke contoh awal. Lanjutkan?")) {
+                const seedInvoice = { id: 111111111, no: "001/INV/II/2026", kapal: "KM. ICON FILIPI", kepada: "PT. INDO CONTAINER LINE", alamat: "Jl. Perak Barat No. 21A, Surabaya", tgl: "2026-02-19", tempo: "2026-03-05", kontrak: "004/SPK/ICON-MTC/II/2026", bankNama: "Bank Mandiri", bankAn: "Ricky Andoko Sakti", bankRek: "143003384651", kotaTgl: "Surabaya, 19 Februari 2026", namaTid: "Ricky Andoko Sakti", grandTotal: 600000, items: [{ desc: "Maintenance CCTV Marine System", qty: 3, harga: 200000 }] };
+                localStorage.setItem('sys_invoices', JSON.stringify([seedInvoice]));
+                localStorage.setItem('sys_reports_v3', JSON.stringify([]));
+                localStorage.setItem('sys_wages', JSON.stringify([]));
+                localStorage.setItem('sys_cash', JSON.stringify([]));
+                
+                resetFormInvoice();
+                resetFormReport();
+                
+                renderInvoiceHistoryList();
+                renderReportHistoryList();
+                renderWages();
+                renderCash();
+                updateDynamicSelectOptions();
+                hitungDanUpdateDashboard();
+                
+                loadInvoiceFromHistory(seedInvoice.id);
+                alert("✅ Semua data telah direset ke kondisi awal!");
+            }
+        }
+
+        // ================= DASHBOARD & CHARTS =================
+        function hitungDanUpdateDashboard() {
+            const invoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            let totalInvoiceValue = invoices.reduce((sum, i) => sum + (i.grandTotal || 0), 0);
+            document.getElementById('dashTotalInvoice').innerText = formatIdr(totalInvoiceValue);
+            document.getElementById('dashCountInvoice').innerText = `${invoices.length} berkas tersimpan`;
+            
+            const cashList = JSON.parse(localStorage.getItem('sys_cash') || "[]");
+            let saldoCash = cashList.reduce((s, c) => c.jenis === 'MASUK' ? s + c.jumlah : s - c.jumlah, 0);
+            document.getElementById('dashTotalCash').innerText = formatIdr(saldoCash);
+            
+            const wageList = JSON.parse(localStorage.getItem('sys_wages') || "[]");
+            let totalWages = wageList.reduce((s, w) => s + w.jumlah, 0);
+            document.getElementById('dashTotalWages').innerText = formatIdr(totalWages);
+            
+            const reportList = JSON.parse(localStorage.getItem('sys_reports_v3') || "[]");
+            document.getElementById('dashTotalReports').innerText = `${reportList.length} Berkas`;
+            renderChartDashboard(totalInvoiceValue, saldoCash, totalWages);
+        }
+        
+        function renderChartDashboard(invoice, cash, wages) {
+            const ctx = document.getElementById('financialChart').getContext('2d');
+            if (finChartInstance) finChartInstance.destroy();
+            finChartInstance = new Chart(ctx, { type: 'bar', data: { labels: ['Piutang Invoice', 'Saldo Kas Kecil', 'Beban Gaji Teknisi'], datasets: [{ label: 'Nilai Finansial Berjalan (Rp)', data: [invoice, cash, wages], backgroundColor: ['#0d6efd', '#198754', '#dc3545'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } } });
+        }
+
+        function simulateSpreadsheetSync() { document.getElementById('syncTime').innerText = 'Sinkronisasi Berhasil: ' + new Date().toLocaleString('id-ID') + ' WIB'; alert("Simulasi sync berhasil! (Database lokal tetap aman)"); }
+        
+        function eksporSeluruhDatabase() {
+            const dbData = { sys_invoices: JSON.parse(localStorage.getItem('sys_invoices') || "[]"), sys_reports_v3: JSON.parse(localStorage.getItem('sys_reports_v3') || "[]"), sys_wages: JSON.parse(localStorage.getItem('sys_wages') || "[]"), sys_cash: JSON.parse(localStorage.getItem('sys_cash') || "[]") };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dbData, null, 2));
+            const anchor = document.createElement('a'); anchor.setAttribute("href", dataStr); anchor.setAttribute("download", `BACKUP_DATABASE_ADMIN_V3.json`); anchor.click();
+        }
+        
+        function imporSeluruhDatabase(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) { try { const parsed = JSON.parse(e.target.result); if(confirm("Tumpuk database saat ini?")) { if(parsed.sys_invoices) localStorage.setItem('sys_invoices', JSON.stringify(parsed.sys_invoices)); if(parsed.sys_reports_v3) localStorage.setItem('sys_reports_v3', JSON.stringify(parsed.sys_reports_v3)); if(parsed.sys_wages) localStorage.setItem('sys_wages', JSON.stringify(parsed.sys_wages)); if(parsed.sys_cash) localStorage.setItem('sys_cash', JSON.stringify(parsed.sys_cash)); window.location.reload(); } } catch(err) { alert("File tidak valid."); } };
+            reader.readAsText(file);
+        }
+
+        // ================= LIFECYCLE INITIALIZER =================
+        window.onload = function() {
+            if(!localStorage.getItem('sys_invoices') || JSON.parse(localStorage.getItem('sys_invoices')).length === 0) {
+                const seed = { id: 111111111, no: "001/INV/II/2026", kapal: "KM. ICON FILIPI", kepada: "PT. INDO CONTAINER LINE", alamat: "Jl. Perak Barat No. 21A, Surabaya", tgl: "2026-02-19", tempo: "2026-03-05", kontrak: "004/SPK/ICON-MTC/II/2026", bankNama: "Bank Mandiri", bankAn: "Ricky Andoko Sakti", bankRek: "143003384651", kotaTgl: "Surabaya, 19 Februari 2026", namaTid: "Ricky Andoko Sakti", grandTotal: 600000, items: [{ desc: "Maintenance CCTV Marine System", qty: 3, harga: 200000 }] };
+                localStorage.setItem('sys_invoices', JSON.stringify([seed]));
+            }
+            
+            const activeInvoices = JSON.parse(localStorage.getItem('sys_invoices') || "[]");
+            if(activeInvoices.length > 0) {
+                loadInvoiceFromHistory(activeInvoices[0].id);
+            } else {
+                resetFormInvoice();
+            }
+            
+            document.getElementById('formReportItemContainer').innerHTML = "";
+            tambahBarisItemLaporan("Pengecekan perkabelan utama dari panel dek atas hingga ruang kemudi kapt.", "");
+            
+            renderInvoiceHistoryList();
+            renderReportHistoryList();
+            renderWages();
+            renderCash();
+            updateDynamicSelectOptions();
+            hitungDanUpdateDashboard();
+        };
+    </script>
+</body>
+</html>
